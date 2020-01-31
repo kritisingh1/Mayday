@@ -4,13 +4,20 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 public class MailSenderActivity extends AsyncTask<String, Void, Boolean> {
+    /**
+     * sender
+     * password
+     * recipients
+     * subject
+     * body
+     */
     protected Boolean doInBackground(String... msgs) {
         try {
-            GMailSender sender = new GMailSender("babyyodaisop@gmail.com", "starwars@2016");
-            sender.sendMail("This is Subject",
-                    "This is Body",
-                    "babyyodaisop@gmail.com",
-                    "nikhil.celtics@gmail.com");
+            GMailSender sender = new GMailSender(msgs[0], msgs[1]);
+            sender.sendMail(msgs[3],
+                    msgs[4],
+                    msgs[0],
+                    msgs[2]);
         } catch (Exception e) {
             Log.e("SendMail", e.getMessage(), e);
             return false;
