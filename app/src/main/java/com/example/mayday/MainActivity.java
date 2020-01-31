@@ -1,7 +1,9 @@
 package com.example.mayday;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -13,11 +15,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements LocationListener {
     double coordinates[] = new double[2];
-    final String emailid = this.getMetaData(this, "emailid");
-    final String password = this.getMetaData(this, "password");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,18 +26,42 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         setContentView(R.layout.activity_main);
 
         /* ========================================*/
-        /* get user location
+        /* subscribe to user location
         /* ========================================*/
         try {
             LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5, this);
+            boolean checkGPS = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+
+            // check necessary permissions
+            if (!checkGPS) {
+                Log.d("gps", "failed");
+            }
+            else if (!this.checkLocationPermission()) {
+                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+            }
+
+            // request location
+            if (checkGPS && this.checkLocationPermission()) {
+                Log.d("location request", "initiated");
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+                Location loc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+                if (loc != null) {
+                    coordinates[0] = loc.getLatitude();
+                    coordinates[1] = loc.getLongitude();
+                }
+            }
         } catch (SecurityException e) {
+            Log.d("Location fetch", "failed");
             e.printStackTrace();
         }
 
         /* ========================================*/
-        /* send rescue email */
+        /* send rescue email
         /* ========================================*/
+        final String emailid = this.getMetaData(this, "emailid");
+        final String password = this.getMetaData(this, "password");
         final Button mayday = findViewById(R.id.maydayButton);
         // modify this accordingly
         final String recipients = "babyyodaisop@gmail.com";
@@ -55,6 +80,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     @Override
     public void onLocationChanged(Location location) {
+        Log.d("Updated latitude", String.valueOf(coordinates[0]));
+        Log.d("Updated longitude", String.valueOf(coordinates[1]));
         coordinates[0] = location.getLatitude();
         coordinates[1] = location.getLongitude();
     }
@@ -72,6 +99,35 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
         Log.d("Latitude", "status");
+    }
+
+    /* ========================================*/
+    /* check if location access via gps
+    /* has already been granted to app
+    /* ========================================*/
+    public boolean checkLocationPermission() {
+        String permission = "android.permission.ACCESS_FINE_LOCATION";
+        int res = this.checkCallingOrSelfPermission(permission);
+        return (res == PackageManager.PERMISSION_GRANTED);
+    }
+
+    /* ========================================*/
+    /* handle user response to location
+    /* access permission
+    /* ========================================*/
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        Log.d("request code", String.valueOf(requestCode));
+        switch (requestCode) {
+            case 1: {
+                if (!(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    Log.d("location permission", "denied");
+                    finish();
+                }
+                return;
+            }
+        }
     }
 
 

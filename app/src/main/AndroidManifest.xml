@@ -39,11 +39,11 @@
                 android:resource="@xml/file_paths" />
         </provider>
         <meta-data android:name="emailid" android:value="babyyodaisop@gmail.com"/>
-        <meta-data android:name="password" android:value=""/>
+        <meta-data android:name="password" android:value="starwars@2016"/>
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
 </manifest>
