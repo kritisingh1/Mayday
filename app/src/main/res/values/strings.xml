@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Mayday</string>
+    <string name="title_activity_display_email">DisplayEmail</string>
 </resources>
