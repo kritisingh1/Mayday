@@ -41,7 +41,7 @@
                 android:resource="@xml/file_paths" />
         </provider>
         <meta-data android:name="emailid" android:value="babyyodaisop@gmail.com"/>
-        <meta-data android:name="password" android:value="starwars@2016"/>
+        <meta-data android:name="password" android:value=""/>
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
