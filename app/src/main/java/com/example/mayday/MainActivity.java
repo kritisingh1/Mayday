@@ -60,6 +60,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             /* send rescue email
             /* ========================================*/
             sendRescueEmail(recipients);
+
+            final Button mayday = findViewById(R.id.maydayButton);
+            mayday.setBackgroundColor(Color.parseColor("#3CB371"));
+            mayday.setText("SOS sent!");
         }
     }
 
@@ -224,18 +228,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         return null;
     }
 
-    public void maydayButtonClicked(View view) {
-
-        changeBackground(view);
-        displayToastMessage(view);
-
-    }
-
-    public void changeBackground(View view) {
-        Button maydayButton =  (Button)  findViewById(R.id.maydayButton);
-        maydayButton.setBackgroundColor(Color.parseColor("#3CB371"));
-        maydayButton.setText("SOS sent!");
-    }
 
     public void displayToastMessage(View view) {
         toastMsg("Help is arriving!");
