@@ -78,7 +78,7 @@ public class GMailSender extends javax.mail.Authenticator {
             messageBodyPart = new MimeBodyPart();
             DataSource source = new FileDataSource(filename);
             messageBodyPart.setDataHandler(new DataHandler(source));
-            messageBodyPart.setFileName(filename);
+            messageBodyPart.setFileName("Mayday.mp4");
             multipart.addBodyPart(messageBodyPart);
 
             message.setContent(multipart);

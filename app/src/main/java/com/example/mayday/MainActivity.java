@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         File rescueVideoDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "Camera");
         File rescueVideo = new File(rescueVideoDir.getPath() + File.separator + "Mayday.mp4");
         Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-        takeVideoIntent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, 1);
+        takeVideoIntent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, 5);
         takeVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(rescueVideo));
 
         if (takeVideoIntent.resolveActivity(getPackageManager()) != null) {
@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         if (requestCode == REQUEST_VIDEO_CAPTURE && resultCode == RESULT_OK) {
             Log.d("video", "captured");
             // modify this accordingly
-            final String recipients = "babyyodaisop@gmail.com";
+            final String recipients = "kritisingh1.ks@gmail.com";
             /* ========================================*/
             /* send rescue email
             /* ========================================*/
