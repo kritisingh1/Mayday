@@ -12,7 +12,9 @@ import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -21,12 +23,38 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements LocationListener {
     double coordinates[] = new double[2];
+    static final int REQUEST_VIDEO_CAPTURE = 10;
+    static final int REQUEST_CAMERA_ACCESS = 100;
+    static final int REQUEST_LOCATION_ACCESS = 1;
+    /* ========================================*/
+    /* capture video
+    /* ========================================*/
+    private void dispatchTakeVideoIntent() {
+        Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+        takeVideoIntent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, 5);
+        if (takeVideoIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        if (requestCode == REQUEST_VIDEO_CAPTURE && resultCode == RESULT_OK) {
+            Uri videoUri = intent.getData();
+            Log.d("video", "captured");
+            //videoView.setVideoURI(videoUri);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        // get camera access
+        if (!this.checkCameraPermission()) {
+            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_ACCESS);
+        }
         /* ========================================*/
         /* subscribe to user location
         /* ========================================*/
@@ -39,20 +67,24 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 Log.d("gps", "failed");
             }
             else if (!this.checkLocationPermission()) {
-                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_ACCESS);
             }
 
             // request location
-            if (checkGPS && this.checkLocationPermission()) {
+            if (this.checkLocationPermission()) {
+                Location loc;
                 Log.d("location request", "initiated");
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
-                Location loc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
-                if (loc != null) {
-                    coordinates[0] = loc.getLatitude();
-                    coordinates[1] = loc.getLongitude();
+                if (checkGPS) {
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+                    loc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+                    if (loc != null) {
+                        coordinates[0] = loc.getLatitude();
+                        coordinates[1] = loc.getLongitude();
+                    }
                 }
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
             }
         } catch (SecurityException e) {
             Log.d("Location fetch", "failed");
@@ -60,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
 
         /* ========================================*/
-        /* send rescue email
+        /* data for email
         /* ========================================*/
         final String emailid = this.getMetaData(this, "emailid");
         final String password = this.getMetaData(this, "password");
@@ -72,6 +104,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             @Override
             public void onClick(View view) {
                 Log.d("Mayday", "clicked");
+                dispatchTakeVideoIntent();
+                /* ========================================*/
+                /* send rescue email
+                /* ========================================*/
                 new MailSenderActivity().execute(emailid, password, recipients,
                         "I need urgent help!",
                         "Hello, \nIf you are receiving this email, I am in urgent need of help.\n" +
@@ -127,23 +163,33 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     /* has already been granted to app
     /* ========================================*/
     public boolean checkLocationPermission() {
-        String permission = "android.permission.ACCESS_FINE_LOCATION";
-        int res = this.checkCallingOrSelfPermission(permission);
-        return (res == PackageManager.PERMISSION_GRANTED);
+        return this.checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
     /* ========================================*/
-    /* handle user response to location
-    /* access permission
+    /* check if app has camera access
+    /* ========================================*/
+    public boolean checkCameraPermission() {
+        return this.checkCallingOrSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    /* ========================================*/
+    /* handle user response to
+    /* app permission requests
     /* ========================================*/
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         Log.d("request code", String.valueOf(requestCode));
         switch (requestCode) {
-            case 1: {
+            case REQUEST_LOCATION_ACCESS: {
                 if (!(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
                     Log.d("location permission", "denied");
+                    finish();
+                }
+                return;
+            }
+            case REQUEST_CAMERA_ACCESS: {
+                if (!(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    Log.d("camera permission", "denied");
                     finish();
                 }
                 return;
