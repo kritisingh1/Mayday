@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -42,6 +43,21 @@ public class DisplayEmail extends AppCompatActivity {
 
         prepareContactData();
 
+        Intent i = getIntent();
+
+        // Receiving the data from the form
+
+        try {
+            String name = i.getStringExtra("name");
+            String email = i.getStringExtra("email");
+            if(name!=null) {
+                prepareContactDataOnUpdate(name, email);
+            }
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+
+
 
         /*start new activity on clicking fab button*/
 
@@ -71,6 +87,26 @@ public class DisplayEmail extends AppCompatActivity {
         contactsList.add(contact);
 
         cAdapter.notifyDataSetChanged();
+
     }
+
+    public void prepareContactDataOnUpdate(String name, String email) {
+
+        Contacts contact = new Contacts("abc", "abc@example.com");
+        contactsList.add(contact);
+
+        contact = new Contacts("def", "def@example.com");
+        contactsList.add(contact);
+
+        contact = new Contacts("ghi", "ghi@example.com");
+        contactsList.add(contact);
+
+        contact = new Contacts(name, email);
+        contactsList.add(contact);
+
+        cAdapter.notifyDataSetChanged();
+
+    }
+
 
 }
