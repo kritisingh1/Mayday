@@ -69,6 +69,7 @@ public class DisplayEmail extends AppCompatActivity {
                 // start a new intent
                 Intent nextScreen = new Intent(getApplicationContext(), AddContact.class);
 
+                finish();
                 startActivity(nextScreen);
             }
 
@@ -92,16 +93,7 @@ public class DisplayEmail extends AppCompatActivity {
 
     public void prepareContactDataOnUpdate(String name, String email) {
 
-        Contacts contact = new Contacts("abc", "abc@example.com");
-        contactsList.add(contact);
-
-        contact = new Contacts("def", "def@example.com");
-        contactsList.add(contact);
-
-        contact = new Contacts("ghi", "ghi@example.com");
-        contactsList.add(contact);
-
-        contact = new Contacts(name, email);
+        Contacts contact = new Contacts(name, email);
         contactsList.add(contact);
 
         cAdapter.notifyDataSetChanged();

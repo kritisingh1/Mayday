@@ -37,6 +37,7 @@ public class AddContact extends AppCompatActivity {
 
                 Log.e("n", inputName.getText()+"."+ inputEmail.getText());
 
+                finish();
                 startActivity(nextScreen);
 
             }
