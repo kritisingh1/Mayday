@@ -26,6 +26,8 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.IOException;
 
+import javax.mail.Quota;
+
 import static com.example.mayday.CameraActivity.MEDIA_TYPE_VIDEO;
 
 public class MainActivity extends AppCompatActivity implements LocationListener {
@@ -60,7 +62,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             /* send rescue email
             /* ========================================*/
             sendRescueEmail(recipients);
-
+            /* ========================================*/
+            /* update UI
+            /* ========================================*/
             final Button mayday = findViewById(R.id.maydayButton);
             mayday.setBackgroundColor(Color.parseColor("#3CB371"));
             mayday.setText("SOS sent!");
@@ -86,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         final Button mayday = findViewById(R.id.maydayButton);
+        final Button reset = (Button) findViewById(R.id.resetButton);
         // get camera access
         if (!this.checkCameraPermission()) {
             ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_ACCESS);
@@ -133,6 +138,17 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 dispatchTakeVideoIntent();
             }
         });
+
+        reset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mayday.setBackgroundColor(Color.TRANSPARENT);
+                mayday.setBackgroundResource(R.drawable.custom_image_button);
+                mayday.setText("Mayday");
+            }
+        });
+
+
 
         /* =============================================================
                 display list of emergency contacts on button click
