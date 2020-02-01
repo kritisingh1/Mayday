@@ -18,7 +18,9 @@
         android:background="@drawable/custom_image_button"
         android:text="Mayday"
         android:textSize="25sp"
-        android:src="@drawable/mayday" />
+        android:src="@drawable/mayday"
+        android:onClick="maydayButtonClicked"
+        />
 
     <Button
         android:id="@+id/resetButton"

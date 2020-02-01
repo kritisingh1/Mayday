@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -161,4 +162,27 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
         return null;
     }
+
+    public void maydayButtonClicked(View view) {
+
+        changeBackground(view);
+        displayToastMessage(view);
+
+    }
+
+    public void changeBackground(View view) {
+        Button maydayButton =  (Button)  findViewById(R.id.maydayButton);
+        maydayButton.setBackgroundColor(Color.parseColor("#3CB371"));
+        maydayButton.setText("SOS sent!");
+    }
+
+    public void displayToastMessage(View view) {
+        toastMsg("Help is arriving!");
+    }
+
+    public void toastMsg(String msg) {
+        Toast toast = Toast.makeText(this, msg, Toast.LENGTH_LONG);
+        toast.show();
+    }
+
 }

@@ -18,7 +18,7 @@ public class AddContact extends AppCompatActivity {
         inputName = (EditText) findViewById(R.id.contactName);
         inputEmail = (EditText) findViewById(R.id.contactEmail);
 
-        
+
 
     }
 }
