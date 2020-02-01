@@ -5,6 +5,7 @@ import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -76,6 +77,25 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                                 "My location coordinates are : (" + coordinates[0] + " , " + coordinates[1] + ").");
             }
         });
+
+        /* =============================================================
+                display list of emergency contacts on button click
+           =============================================================*/
+
+        Button contactButton = (Button) findViewById(R.id.contactButton);
+
+        contactButton.setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View arg0) {
+                // start a new intent
+                Intent nextScreen = new Intent(getApplicationContext(), DisplayEmail.class);
+
+                startActivity(nextScreen);
+            }
+
+        });
+
+
     }
 
     @Override

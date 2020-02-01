@@ -1,5 +1,6 @@
 package com.example.mayday;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 
 import android.view.View;
+import android.widget.Button;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +39,23 @@ public class DisplayEmail extends AppCompatActivity {
         recyclerView.setAdapter(cAdapter);
 
         prepareContactData();
+
+
+        /*start new activity on clicking fab button*/
+
+        Button fab = (Button) findViewById(R.id.fab);
+
+        fab.setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View arg0) {
+                // start a new intent
+                Intent nextScreen = new Intent(getApplicationContext(), AddContact.class);
+
+                startActivity(nextScreen);
+            }
+
+        });
+
     }
 
     private void prepareContactData() {
