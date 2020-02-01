@@ -14,12 +14,19 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
+
+import java.io.File;
+import java.io.IOException;
+
+import static com.example.mayday.CameraActivity.MEDIA_TYPE_VIDEO;
 
 public class MainActivity extends AppCompatActivity implements LocationListener {
     double coordinates[] = new double[2];
@@ -30,27 +37,51 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     /* capture video
     /* ========================================*/
     private void dispatchTakeVideoIntent() {
+        File rescueVideoDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "Camera");
+        File rescueVideo = new File(rescueVideoDir.getPath() + File.separator + "Mayday.mp4");
         Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-        takeVideoIntent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, 5);
+        takeVideoIntent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, 1);
+        takeVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(rescueVideo));
+
         if (takeVideoIntent.resolveActivity(getPackageManager()) != null) {
             startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE);
         }
     }
 
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
         if (requestCode == REQUEST_VIDEO_CAPTURE && resultCode == RESULT_OK) {
-            Uri videoUri = intent.getData();
             Log.d("video", "captured");
-            //videoView.setVideoURI(videoUri);
+            // modify this accordingly
+            final String recipients = "babyyodaisop@gmail.com";
+            /* ========================================*/
+            /* send rescue email
+            /* ========================================*/
+            sendRescueEmail(recipients);
         }
+    }
+
+    protected void sendRescueEmail(String recipients) {
+        /* ========================================*/
+        /* data for email
+        /* ========================================*/
+        final String emailid = this.getMetaData(this, "emailid");
+        final String password = this.getMetaData(this, "password");
+        new MailSenderActivity().execute(emailid, password, recipients,
+                "I need urgent help!",
+                "Hello, \nIf you are receiving this email, I am in urgent need of help.\n" +
+                        "My location coordinates are : (" + coordinates[0] + " , " + coordinates[1] + ").");
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        final Button mayday = findViewById(R.id.maydayButton);
         // get camera access
         if (!this.checkCameraPermission()) {
             ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_ACCESS);
@@ -91,27 +122,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             e.printStackTrace();
         }
 
-        /* ========================================*/
-        /* data for email
-        /* ========================================*/
-        final String emailid = this.getMetaData(this, "emailid");
-        final String password = this.getMetaData(this, "password");
-        final Button mayday = findViewById(R.id.maydayButton);
-        // modify this accordingly
-        final String recipients = "babyyodaisop@gmail.com";
-
         mayday.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Log.d("Mayday", "clicked");
                 dispatchTakeVideoIntent();
-                /* ========================================*/
-                /* send rescue email
-                /* ========================================*/
-                new MailSenderActivity().execute(emailid, password, recipients,
-                        "I need urgent help!",
-                        "Hello, \nIf you are receiving this email, I am in urgent need of help.\n" +
-                                "My location coordinates are : (" + coordinates[0] + " , " + coordinates[1] + ").");
             }
         });
 
